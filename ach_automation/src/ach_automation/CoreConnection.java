@@ -91,6 +91,27 @@ public class CoreConnection extends Thread{
 		}
 	}
 	
+	public void sendData(String dest_module, String data) {
+		//Creation du paquet data_message
+		JSONObject tmp_json = new JSONObject();
+		tmp_json.put("type", "packet.message_module");
+		tmp_json.put("message_module.dest",dest_module);
+		tmp_json.put("message_module.src",this.module_name);
+		tmp_json.put("message_module.content", data);
+		//Envoi du paquet
+		this.os.println(tmp_json);
+		this.os.flush();
+	}
+	
+	public void sendLog(String log) {
+		//Creation du paquet log
+		JSONObject tmp_json = new JSONObject();
+		tmp_json.put("type", "packet.log");
+		tmp_json.put("log.message", log);
+		//Envoi du paquet
+		this.os.println(tmp_json);
+		this.os.flush();
+	}
 	
 	
 }
