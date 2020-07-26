@@ -10,6 +10,7 @@ public class Automation_destination extends Automation_source implements Automat
 	
 	public Automation_destination(String pName) throws RoutingException {
 		super(pName);
+		destination_list.add(this);
 	}
 
 	@Override
