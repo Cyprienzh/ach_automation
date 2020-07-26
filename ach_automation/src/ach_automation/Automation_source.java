@@ -62,7 +62,7 @@ public class Automation_source {
 	}
 	
 	public static ArrayList<Automation_source> getSources() {return source_list;}
-	
+	public String getSourceName() {return this.source_name;}
 	
 	public class RoutingException extends Exception {
 		private static final long serialVersionUID = 1L;
