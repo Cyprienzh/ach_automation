@@ -1,5 +1,6 @@
 package ach_automation;
 
+import ach_automation.Automation_source.RoutingException;
 
 public class Automation_core {
 	
@@ -11,7 +12,7 @@ public class Automation_core {
 	public static Automation_Handler core_handler;
 	
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws RoutingException {
 		core_handler = new Automation_Handler();
 		core_connection = new CoreConnection(core_handler,HOST,PORT,MODULE_NAME,args[0]);
 	}

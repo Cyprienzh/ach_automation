@@ -9,7 +9,7 @@ package ach_automation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Map.Entry;
 import javax.swing.event.EventListenerList;
 
 public class Automation_source {
@@ -20,8 +20,8 @@ public class Automation_source {
 	private String[] source_value;
 	private EventListenerList listeners = new EventListenerList();
 	
-	private Map<AutomationSourceListener, Integer> input_port_list = new HashMap<AutomationSourceListener, Integer>();
-	private Map<AutomationSourceListener, Integer> output_port_list = new HashMap<AutomationSourceListener, Integer>();
+	//Table de correspondance pour chaque Listener de port_local / port_distant
+	private Map<AutomationSourceListener, Map<Integer,Integer>> ports_list = new HashMap<AutomationSourceListener, Map<Integer,Integer>>();
 	
 	public Automation_source (String pName) throws RoutingException{
 		//Verification de non-existence d'une source, destination ou processeur du meme nom
@@ -35,22 +35,28 @@ public class Automation_source {
 		source_list.add(this);
 	}
 	
-	public void setValue(String pValue, int output_port) {
-		this.source_value[output_port] = pValue; // Changement de la valeur du port de la source
+	public void setValue(String pValue, int local_port) {
+		this.source_value[local_port] = pValue; // Changement de la valeur du port de la source
 		//Envoi de la nouvelle valeur aux destinations ou processeurs connectés
 		for(AutomationSourceListener listener : listeners.getListeners(AutomationSourceListener.class)) {
-			if(this.output_port_list.get(listener) == output_port) {
-				listener.sourceValueChange(this.input_port_list.get(listener), this.source_value[output_port]);
+			for(Entry<Integer,Integer> ports : this.ports_list.get(listener).entrySet()) {
+				if(ports.getValue().equals(local_port)) {
+					listener.sourceValueChange(ports.getKey(), this.source_value[local_port]);
+				}
 			}
 		}
 	}
 	
-	public void addSourceListener(AutomationSourceListener listener, int in_port, int out_port) {
+	public void addSourceListener(AutomationSourceListener listener, int local_port, int distant_port) {
 		//Ajout de la destination ou processeur à la liste de diffusion
-		listeners.add(AutomationSourceListener.class, listener);
+		if(!contains_listener(listener)) { listeners.add(AutomationSourceListener.class, listener);}
 		//Mise en mémoire des ports d'entrée et sortie de la destination ou du processeur
-		this.input_port_list.put(listener, in_port);
-		this.output_port_list.put(listener, out_port);
+		if(this.ports_list.containsKey(listener)) {
+			this.ports_list.get(listener).put(distant_port, local_port);
+		}
+		else {
+			this.ports_list.put(listener, new HashMap<Integer,Integer>(Map.of(distant_port,local_port)));
+		}
 	}
 	
 	
@@ -59,6 +65,13 @@ public class Automation_source {
 			if(source_tmp.source_name.equals(pName)) {return source_tmp;}
 		}
 		return null;
+	}
+	
+	public boolean contains_listener(AutomationSourceListener listener) {
+		for(AutomationSourceListener listener_t : listeners.getListeners(AutomationSourceListener.class)) {
+			if(listener_t.equals(listener)) {return true;}
+		}
+		return false;
 	}
 	
 	public static ArrayList<Automation_source> getSources() {return source_list;}

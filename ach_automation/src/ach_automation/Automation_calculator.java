@@ -39,14 +39,14 @@ public class Automation_calculator extends Automation_processor{
 	}
 
 	@Override
-	public void sourceValueChange(int input_port, String input_value) {
-		if(input_port == 1) {
+	public void sourceValueChange(int local_port, String input_value) {
+		if(local_port == 1) {
 			this.proc_x = Double.valueOf(input_value);
 		}
-		else if(input_port == 2) {
+		else if(local_port == 2) {
 			this.proc_y = Double.valueOf(input_value);
 		}
-		else if(input_port == 3) {
+		else if(local_port == 3) {
 			this.proc_z = Double.valueOf(input_value);
 		}
 		this.doCalcul();
@@ -57,16 +57,22 @@ public class Automation_calculator extends Automation_processor{
 			this.variables.set("x", this.proc_x);
 			this.variables.set("y", this.proc_y);
 			this.variables.set("z", this.proc_z);
+			String result_tmp = String.valueOf(this.eval.evaluate(proc_formula, variables));
+			this.setValue(result_tmp, 1);
 		}
 		else if(this.proc_deg == 2 && this.proc_x != null && this.proc_y != null) {
 			this.variables.set("x", this.proc_x);
 			this.variables.set("y", this.proc_y);
+			String result_tmp = String.valueOf(this.eval.evaluate(proc_formula, variables));
+			this.setValue(result_tmp, 1);
 		}
 		else if(this.proc_deg == 1 && this.proc_x != null) {
 			this.variables.set("x", this.proc_x);
+			String result_tmp = String.valueOf(this.eval.evaluate(proc_formula, variables));
+			this.setValue(result_tmp, 1);
 		}
-		String result_tmp = String.valueOf(this.eval.evaluate(proc_formula, variables));
-		this.setValue(result_tmp, 0);
+		
+		
 	}
 
 }
